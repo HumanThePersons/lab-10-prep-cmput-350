@@ -3,6 +3,7 @@
 uniform float WINDOW_WIDTH = 800.0;
 uniform float WINDOW_HEIGHT = 600.0;
 uniform vec2 cursorPosition = vec2(0.0, 0.0);
+uniform float timeChange = 0.0;
 
 void main(void) {
     // Calculate distance from cursor to current pixel
@@ -18,6 +19,9 @@ void main(void) {
 
         // Fragment shader should output into gl_FragColor an RGBA:
         // RGB - R is based on the x, G is based on the y, B is always 0, A is always 1
+        
+        float shift = sin(timeChange) * 0.5;  // horizontal shift that moves back and forth
+        uv += vec2(shift, 0.0);  // Shifts the background horizontally
         gl_FragColor = vec4(uv.x, uv.y, 0.0, 1.0);
     }
 }

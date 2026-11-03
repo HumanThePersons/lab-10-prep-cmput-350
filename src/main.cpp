@@ -1,7 +1,10 @@
 #include <iostream>
+#include <chrono>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
+
+using namespace std::chrono;
 
 int main() {
     // OpenGL settings we request for:
@@ -35,6 +38,9 @@ int main() {
     sf::Shader shader(std::filesystem::path{"main.vert"}, std::filesystem::path{"main.frag"});
     // TODO: eventually add another Shader here which uses the blur fragment shader,
     // also create a sf::RenderTexture...
+
+    time_point<steady_clock> start = steady_clock::now();
+
     while (window.isOpen()) {
         while (auto e = window.pollEvent()) {
             if (e->is<sf::Event::Closed>()) {
@@ -49,6 +55,8 @@ int main() {
         mousePos.y = static_cast<float>(window.getSize().y) - mousePos.y;  // x is just mouse.x, but y needs to be flipped
 
         shader.setUniform("cursorPosition", mousePos);
+        // Source for the following - https://stackoverflow.com/a/35486947
+        shader.setUniform("timeChange", std::chrono::duration<float>(steady_clock::now() - start).count());
 
         // a RenderTexture first before postprocessing into the window target.
         window.clear(sf::Color::Black);
