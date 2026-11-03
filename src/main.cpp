@@ -36,8 +36,11 @@ int main() {
     fullscreenTriangle[2].texCoords = {0, 2};
     // load vertex and fragment shaders:
     sf::Shader shader(std::filesystem::path{"main.vert"}, std::filesystem::path{"main.frag"});
+
     // TODO: eventually add another Shader here which uses the blur fragment shader,
     // also create a sf::RenderTexture...
+    sf::Shader blurShader(std::filesystem::path{"main.vert"}, std::filesystem::path{"blur.frag"});
+    sf::RenderTexture preBlurRenderTexture(window.getSize());
 
     time_point<steady_clock> start = steady_clock::now();
 
@@ -58,9 +61,19 @@ int main() {
         // Source for the following - https://stackoverflow.com/a/35486947
         shader.setUniform("timeChange", std::chrono::duration<float>(steady_clock::now() - start).count());
 
+        // Render the scene into the texture
+        preBlurRenderTexture.clear();
+        preBlurRenderTexture.draw(fullscreenTriangle, &shader);
+        preBlurRenderTexture.display();
+
+        // Blur the texture and render it to the window
+        blurShader.setUniform("texture", preBlurRenderTexture.getTexture());
+        blurShader.setUniform("WINDOW_WIDTH", static_cast<float>(window.getSize().x));
+        blurShader.setUniform("WINDOW_HEIGHT", static_cast<float>(window.getSize().y));
+
         // a RenderTexture first before postprocessing into the window target.
         window.clear(sf::Color::Black);
-        window.draw(fullscreenTriangle, &shader);
+        window.draw(fullscreenTriangle, &blurShader);
         window.display();
     }
     return 0;
