@@ -41,7 +41,15 @@ int main() {
                 return 0;
             }
         }
-        // TODO: set shader uniforms and eventually draw into
+        // Set shader uniforms and eventually draw into
+        shader.setUniform("WINDOW_WIDTH", static_cast<float>(window.getSize().x));
+        shader.setUniform("WINDOW_HEIGHT", static_cast<float>(window.getSize().y));
+
+        sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+        mousePos.y = static_cast<float>(window.getSize().y) - mousePos.y;  // x is just mouse.x, but y needs to be flipped
+
+        shader.setUniform("cursorPosition", mousePos);
+
         // a RenderTexture first before postprocessing into the window target.
         window.clear(sf::Color::Black);
         window.draw(fullscreenTriangle, &shader);
